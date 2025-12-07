@@ -1,5 +1,39 @@
 import type { Citation, CitationGraph, GraphNode, GraphEdge, BiasMetrics, DiversityMetrics, QualityScores, RedFlag } from '../types';
 
+// Cache for expensive calculations
+const calculationCache = new Map<string, any>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface CacheEntry<T> {
+  value: T;
+  timestamp: number;
+}
+
+function getCached<T>(key: string): T | null {
+  const entry = calculationCache.get(key) as CacheEntry<T> | undefined;
+  if (!entry) return null;
+  
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    calculationCache.delete(key);
+    return null;
+  }
+  
+  return entry.value;
+}
+
+function setCached<T>(key: string, value: T): void {
+  calculationCache.set(key, {
+    value,
+    timestamp: Date.now(),
+  });
+}
+
+function createCacheKey(prefix: string, citations: Citation[]): string {
+  // Create a hash from citation URLs for cache key
+  const urls = citations.map(c => c.url).sort().join('|');
+  return `${prefix}:${urls.length}:${urls.slice(0, 100)}`;
+}
+
 export function extractDomain(url: string): string {
   try {
     const urlObj = new URL(url);
@@ -64,64 +98,80 @@ export function calculateReliability(url: string, sourceType: Citation['sourceTy
 
 export function extractCitationsFromText(text: string): Citation[] {
   const citations: Citation[] = [];
+  const seenUrls = new Set<string>(); // Track seen URLs to avoid duplicates efficiently
   
   // Match markdown links: [text](url)
   const markdownPattern = /\[([^\]]+)\]\(([^\)]+)\)/g;
   let match;
   
   while ((match = markdownPattern.exec(text)) !== null) {
-    const url = match[2];
-    const text = match[1];
-    const domain = extractDomain(url);
-    const sourceType = classifySourceType(url);
-    const reliability = calculateReliability(url, sourceType);
-    
-    citations.push({
-      url,
-      text,
-      domain,
-      sourceType,
-      reliability,
-    });
+    const url = match[2].trim();
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      const normalizedUrl = url.replace(/[.,;:!?)]+$/, '');
+      if (!seenUrls.has(normalizedUrl)) {
+        seenUrls.add(normalizedUrl);
+        const domain = extractDomain(normalizedUrl);
+        const sourceType = classifySourceType(normalizedUrl);
+        const reliability = calculateReliability(normalizedUrl, sourceType);
+        
+        citations.push({
+          url: normalizedUrl,
+          text: match[1],
+          domain,
+          sourceType,
+          reliability,
+        });
+      }
+    }
   }
   
   // Match HTML links: <a href="url">text</a>
   const htmlPattern = /<a[^>]+href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/gi;
   while ((match = htmlPattern.exec(text)) !== null) {
-    const url = match[1];
-    const text = match[2].trim();
-    const domain = extractDomain(url);
-    const sourceType = classifySourceType(url);
-    const reliability = calculateReliability(url, sourceType);
-    
-    // Avoid duplicates
-    if (!citations.some(c => c.url === url)) {
-      citations.push({
-        url,
-        text,
-        domain,
-        sourceType,
-        reliability,
-      });
+    const url = match[1].trim();
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      const normalizedUrl = url.replace(/[.,;:!?)]+$/, '');
+      if (!seenUrls.has(normalizedUrl)) {
+        seenUrls.add(normalizedUrl);
+        const domain = extractDomain(normalizedUrl);
+        const sourceType = classifySourceType(normalizedUrl);
+        const reliability = calculateReliability(normalizedUrl, sourceType);
+        
+        citations.push({
+          url: normalizedUrl,
+          text: match[2].trim(),
+          domain,
+          sourceType,
+          reliability,
+        });
+      }
     }
   }
   
-  // Match bare URLs
-  const urlPattern = /https?:\/\/[^\s<>"\'\)]+/g;
+  // Match bare URLs (only if not already found in markdown/HTML)
+  // Use a more precise pattern that avoids matching URLs already in markdown/HTML
+  const urlPattern = /https?:\/\/[^\s<>"\'\)\[\]]+/g;
   while ((match = urlPattern.exec(text)) !== null) {
     const url = match[0].replace(/[.,;:!?)]+$/, '');
-    const domain = extractDomain(url);
-    const sourceType = classifySourceType(url);
-    const reliability = calculateReliability(url, sourceType);
-    
-    if (!citations.some(c => c.url === url)) {
-      citations.push({
-        url,
-        text: url,
-        domain,
-        sourceType,
-        reliability,
-      });
+    // Check if this URL is not part of a markdown or HTML link
+    const startPos = match.index;
+    const contextBefore = text.substring(Math.max(0, startPos - 10), startPos);
+    // Skip if it's part of a markdown or HTML link
+    if (!contextBefore.includes('](') && !contextBefore.toLowerCase().includes('<a')) {
+      if (!seenUrls.has(url)) {
+        seenUrls.add(url);
+        const domain = extractDomain(url);
+        const sourceType = classifySourceType(url);
+        const reliability = calculateReliability(url, sourceType);
+        
+        citations.push({
+          url,
+          text: url,
+          domain,
+          sourceType,
+          reliability,
+        });
+      }
     }
   }
   
@@ -173,6 +223,11 @@ export function calculateBiasMetrics(citations: Citation[]): BiasMetrics {
     };
   }
   
+  // Check cache
+  const cacheKey = createCacheKey('bias', citations);
+  const cached = getCached<BiasMetrics>(cacheKey);
+  if (cached) return cached;
+  
   const domainCounts: Record<string, number> = {};
   const sourceTypeCounts: Record<string, number> = {};
   
@@ -191,7 +246,7 @@ export function calculateBiasMetrics(citations: Citation[]): BiasMetrics {
   
   const sourceConcentration = (topDomainPercentage + singleClusterRisk) / 2;
   
-  return {
+  const result = {
     sourceConcentration,
     singleClusterRisk,
     topDomain,
@@ -199,6 +254,9 @@ export function calculateBiasMetrics(citations: Citation[]): BiasMetrics {
     domainDistribution: domainCounts,
     sourceTypeDistribution: sourceTypeCounts,
   };
+  
+  setCached(cacheKey, result);
+  return result;
 }
 
 export function calculateDiversityMetrics(citations: Citation[]): DiversityMetrics {
@@ -213,6 +271,11 @@ export function calculateDiversityMetrics(citations: Citation[]): DiversityMetri
     };
   }
   
+  // Check cache
+  const cacheKey = createCacheKey('diversity', citations);
+  const cached = getCached<DiversityMetrics>(cacheKey);
+  if (cached) return cached;
+  
   const uniqueDomains = new Set(citations.map(c => c.domain)).size;
   const uniqueSourceTypes = new Set(citations.map(c => c.sourceType)).size;
   
@@ -226,7 +289,7 @@ export function calculateDiversityMetrics(citations: Citation[]): DiversityMetri
   
   const overallDiversity = domainDiversity * 0.4 + sourceTypeDiversity * 0.4 + reliabilityDiversity * 0.2;
   
-  return {
+  const result = {
     domainDiversity,
     sourceTypeDiversity,
     reliabilityDiversity,
@@ -234,6 +297,9 @@ export function calculateDiversityMetrics(citations: Citation[]): DiversityMetri
     uniqueDomains,
     uniqueSourceTypes,
   };
+  
+  setCached(cacheKey, result);
+  return result;
 }
 
 export function calculateQualityScores(citations: Citation[]): QualityScores {
@@ -247,19 +313,27 @@ export function calculateQualityScores(citations: Citation[]): QualityScores {
     };
   }
   
+  // Check cache
+  const cacheKey = createCacheKey('quality', citations);
+  const cached = getCached<QualityScores>(cacheKey);
+  if (cached) return cached;
+  
   const sourceReliability = citations.reduce((sum, c) => sum + c.reliability, 0) / citations.length;
   const diversityMetrics = calculateDiversityMetrics(citations);
   const citationCountScore = Math.min(1, citations.length / 10);
   
   const overallQuality = sourceReliability * 0.4 + diversityMetrics.overallDiversity * 0.3 + citationCountScore * 0.3;
   
-  return {
+  const result = {
     citationQuality: overallQuality,
     sourceReliability,
     diversityScore: diversityMetrics.overallDiversity,
     citationCountScore,
     overallQuality,
   };
+  
+  setCached(cacheKey, result);
+  return result;
 }
 
 export function detectRedFlags(citations: Citation[]): RedFlag[] {

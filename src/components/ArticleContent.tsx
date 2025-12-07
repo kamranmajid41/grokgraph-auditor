@@ -1,12 +1,76 @@
+import { useState, useEffect, useMemo, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Citation } from '../types';
 
 interface ArticleContentProps {
   content: string;
   citations: Citation[];
+  chunkSize?: number; // Number of characters per chunk
 }
 
-export function ArticleContent({ content, citations }: ArticleContentProps) {
+const DEFAULT_CHUNK_SIZE = 5000; // Render 5KB chunks at a time
+const INITIAL_CHUNKS = 2; // Load first 2 chunks immediately
+
+export function ArticleContent({ content, citations, chunkSize = DEFAULT_CHUNK_SIZE }: ArticleContentProps) {
+  const [visibleChunks, setVisibleChunks] = useState(INITIAL_CHUNKS);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  
+  // Split content into chunks
+  const chunks = useMemo(() => {
+    if (content.length <= chunkSize) {
+      return [content];
+    }
+    
+    const chunks: string[] = [];
+    for (let i = 0; i < content.length; i += chunkSize) {
+      chunks.push(content.slice(i, i + chunkSize));
+    }
+    return chunks;
+  }, [content, chunkSize]);
+  
+  const visibleContent = useMemo(() => {
+    return chunks.slice(0, visibleChunks).join('');
+  }, [chunks, visibleChunks]);
+  
+  const hasMore = visibleChunks < chunks.length;
+  
+  // Set up intersection observer for lazy loading
+  useEffect(() => {
+    if (!hasMore || !loadMoreRef.current) return;
+    
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting && hasMore && !isLoadingMore) {
+          setIsLoadingMore(true);
+          // Load next chunk with a small delay to prevent jank
+          setTimeout(() => {
+            setVisibleChunks(prev => Math.min(prev + 1, chunks.length));
+            setIsLoadingMore(false);
+          }, 100);
+        }
+      },
+      { rootMargin: '200px' } // Start loading 200px before reaching the trigger
+    );
+    
+    observerRef.current.observe(loadMoreRef.current);
+    
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, chunks.length, isLoadingMore]);
+  
+  // Memoize citations lookup for performance
+  const citationMap = useMemo(() => {
+    const map = new Map<string, Citation>();
+    citations.forEach(c => map.set(c.url, c));
+    return map;
+  }, [citations]);
+  
   return (
     <div className="prose prose-lg max-w-none prose-invert">
       <ReactMarkdown
@@ -88,8 +152,37 @@ export function ArticleContent({ content, citations }: ArticleContentProps) {
           ),
         }}
       >
-        {content}
+        {visibleContent}
       </ReactMarkdown>
+      
+      {/* Lazy loading trigger */}
+      {hasMore && (
+        <div ref={loadMoreRef} className="flex items-center justify-center py-8">
+          {isLoadingMore ? (
+            <div className="text-[#888] text-sm">Loading more content...</div>
+          ) : (
+            <div className="text-[#888] text-sm">
+              Scroll to load more ({chunks.length - visibleChunks} chunk{chunks.length - visibleChunks !== 1 ? 's' : ''} remaining)
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Progress indicator */}
+      {chunks.length > 1 && (
+        <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
+          <div className="flex items-center justify-between text-sm text-[#888]">
+            <span>Content loaded: {Math.round((visibleChunks / chunks.length) * 100)}%</span>
+            <span>{visibleChunks} of {chunks.length} sections</span>
+          </div>
+          <div className="mt-2 h-1 bg-[#2a2a2a] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-500 transition-all duration-300"
+              style={{ width: `${(visibleChunks / chunks.length) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
