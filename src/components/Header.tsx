@@ -15,12 +15,12 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <header className="bg-[#0a0a0a] border-b border-[#1a1a1a] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600">GrokiPedia</h1>
-            <span className="ml-2 text-sm text-gray-500">Citation Graph Auditor</span>
+          <div className="flex items-baseline">
+            <h1 className="text-2xl font-serif text-[#e5e5e5]">Grokipedia</h1>
+            <span className="ml-2 text-xs text-[#888] font-sans">v0.2</span>
           </div>
           
           <form onSubmit={handleSubmit} className="flex-1 max-w-xl mx-8">
@@ -29,10 +29,10 @@ export function Header() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search articles or create new..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Search articles..."
+                className="w-full pl-10 pr-4 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e5e5e5] placeholder-[#666] focus:ring-2 focus:ring-[#3a3a3a] focus:border-[#3a3a3a] focus:outline-none"
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#666] w-5 h-5" />
             </div>
           </form>
         </div>

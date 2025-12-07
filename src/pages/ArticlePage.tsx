@@ -24,10 +24,10 @@ export function ArticlePage() {
 
   if (loading && !article) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Creating article about "{topic}"...</p>
+          <Loader2 className="w-12 h-12 animate-spin text-[#e5e5e5] mx-auto mb-4" />
+          <p className="text-[#888]">Creating article about "{topic}"...</p>
         </div>
       </div>
     );
@@ -35,12 +35,12 @@ export function ArticlePage() {
 
   if (error && !article) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Error: {error}</p>
+          <p className="text-red-400 mb-4">Error: {error}</p>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-[#1a1a1a] text-[#e5e5e5] border border-[#2a2a2a] rounded-lg hover:bg-[#2a2a2a]"
           >
             Go Back
           </button>
@@ -51,12 +51,12 @@ export function ArticlePage() {
 
   if (!article) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">No article found</p>
+          <p className="text-[#888] mb-4">No article found</p>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-[#1a1a1a] text-[#e5e5e5] border border-[#2a2a2a] rounded-lg hover:bg-[#2a2a2a]"
           >
             Go Home
           </button>
@@ -68,25 +68,25 @@ export function ArticlePage() {
   const graph = buildCitationGraph(article.id, article.title, article.citations);
 
   return (
-    <div className="min-h-screen">
-      <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
+    <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="bg-[#0a0a0a] border-b border-[#1a1a1a] sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center text-gray-600 hover:text-gray-900"
+              className="flex items-center text-[#888] hover:text-[#e5e5e5]"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Home
             </button>
             
-            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex space-x-1 bg-[#1a1a1a] rounded-lg p-1 border border-[#2a2a2a]">
               <button
                 onClick={() => setActiveTab('article')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'article'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-[#2a2a2a] text-[#e5e5e5]'
+                    : 'text-[#888] hover:text-[#e5e5e5]'
                 }`}
               >
                 Article
@@ -95,8 +95,8 @@ export function ArticlePage() {
                 onClick={() => setActiveTab('analysis')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'analysis'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-[#2a2a2a] text-[#e5e5e5]'
+                    : 'text-[#888] hover:text-[#e5e5e5]'
                 }`}
               >
                 Analysis
@@ -105,8 +105,8 @@ export function ArticlePage() {
                 onClick={() => setActiveTab('graph')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
                   activeTab === 'graph'
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-[#2a2a2a] text-[#e5e5e5]'
+                    : 'text-[#888] hover:text-[#e5e5e5]'
                 }`}
               >
                 <BarChart3 className="w-4 h-4 mr-1" />

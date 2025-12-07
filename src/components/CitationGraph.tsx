@@ -54,8 +54,8 @@ export function CitationGraph({ graph }: CitationGraphProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold mb-4">Citation Distribution by Domain</h3>
+      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+        <h3 className="text-lg font-semibold mb-4 text-[#e5e5e5]">Citation Distribution by Domain</h3>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -74,8 +74,8 @@ export function CitationGraph({ graph }: CitationGraphProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold mb-4">Source Type Distribution</h3>
+      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+        <h3 className="text-lg font-semibold mb-4 text-[#e5e5e5]">Source Type Distribution</h3>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={sourceTypeData}>
             <CartesianGrid strokeDasharray="3 3" />

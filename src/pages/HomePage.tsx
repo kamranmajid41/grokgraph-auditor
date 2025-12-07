@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Search, TrendingUp, Shield } from 'lucide-react';
+import { Search, Moon, ArrowUp } from 'lucide-react';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -14,71 +14,87 @@ export function HomePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-gray-900 mb-4">
-          GrokiPedia
-        </h1>
-        <p className="text-xl text-gray-600 mb-8">
-          Citation Graph Auditor - Graph-theoretic fact-checking and bias analysis
-        </p>
-        
-        <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-          <div className="relative">
+    <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+      {/* Star background effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Header */}
+      <div className="relative z-10 pt-8 pb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-baseline">
+            <h1 className="text-4xl font-serif text-[#e5e5e5]">Grokipedia</h1>
+            <span className="ml-2 text-xs text-[#888] font-sans">v0.2</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Moon className="w-5 h-5 text-[#888] cursor-pointer hover:text-[#e5e5e5]" />
+            <button className="px-4 py-2 bg-white text-[#0a0a0a] rounded-lg text-sm font-medium hover:bg-[#e5e5e5]">
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] px-4">
+        <form onSubmit={handleSearch} className="w-full max-w-4xl mb-6">
+          <div className="relative flex items-center">
+            <div className="absolute left-4">
+              <Search className="w-5 h-5 text-[#888]" />
+            </div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for an article or create a new one..."
-              className="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Search articles..."
+              className="w-full pl-12 pr-16 py-4 text-lg bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e5e5e5] placeholder-[#666] focus:ring-2 focus:ring-[#3a3a3a] focus:border-[#3a3a3a] focus:outline-none"
             />
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+            <button
+              type="submit"
+              className="absolute right-2 p-2 bg-[#2a2a2a] rounded-full hover:bg-[#3a3a3a] transition-colors"
+            >
+              <ArrowUp className="w-5 h-5 text-[#888]" />
+            </button>
           </div>
-          <button
-            type="submit"
-              disabled={!searchQuery.trim()}
-            className="mt-4 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-          >
-            Search or Create Article
-          </button>
         </form>
-      </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mt-16">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <FileText className="w-10 h-10 text-blue-600 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Article Analysis</h3>
-          <p className="text-gray-600">
-            Extract citations, build citation graphs, and analyze article quality with graph-theoretic methods.
-          </p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <TrendingUp className="w-10 h-10 text-green-600 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Bias Detection</h3>
-          <p className="text-gray-600">
-            Detect source concentration, ideological clustering, and missing viewpoint diversity.
-          </p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <Shield className="w-10 h-10 text-purple-600 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Quality Scoring</h3>
-          <p className="text-gray-600">
-            Get reliability scores, diversity metrics, and actionable recommendations.
-          </p>
+        {/* Recent Activity Card */}
+        <div className="w-full max-w-4xl bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-[#e5e5e5] mb-1">Atom</h3>
+              <p className="text-sm text-[#888]">New edit approved by Grok</p>
+            </div>
+            <span className="text-sm text-[#666]">41 minutes ago</span>
+          </div>
         </div>
       </div>
 
-      <div className="mt-16 bg-blue-50 border border-blue-200 rounded-lg p-8">
-        <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
-        <ol className="list-decimal list-inside space-y-3 text-gray-700">
-          <li>Enter a topic or search for an existing article</li>
-          <li>Our system generates or analyzes the article content</li>
-          <li>Citations are extracted and classified by source type</li>
-          <li>Graph-theoretic analysis identifies bias and quality issues</li>
-          <li>Get recommendations for improving citation diversity and reliability</li>
-        </ol>
+      {/* Footer */}
+      <div className="relative z-10 border-t border-[#1a1a1a] mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
+          <div className="text-sm text-[#888]">
+            Articles Available: <span className="text-[#e5e5e5]">1,089,057</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-[#666]">
+            <a href="#" className="hover:text-[#e5e5e5] transition-colors">Terms of Service</a>
+            <span>•</span>
+            <a href="#" className="hover:text-[#e5e5e5] transition-colors">Privacy Policy</a>
+            <span>•</span>
+            <a href="#" className="hover:text-[#e5e5e5] transition-colors">AUP</a>
+          </div>
+        </div>
       </div>
     </div>
   );
