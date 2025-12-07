@@ -83,30 +83,30 @@ export function ArticlePage() {
             <div className="flex space-x-1 bg-[#1a1a1a] rounded-lg p-1 border border-[#2a2a2a]">
               <button
                 onClick={() => setActiveTab('article')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   activeTab === 'article'
-                    ? 'bg-[#2a2a2a] text-[#e5e5e5]'
-                    : 'text-[#888] hover:text-[#e5e5e5]'
+                    ? 'bg-[#2a2a2a] text-[#e5e5e5] shadow-sm'
+                    : 'text-[#888] hover:text-[#e5e5e5] hover:bg-[#1a1a1a]'
                 }`}
               >
                 Article
               </button>
               <button
                 onClick={() => setActiveTab('analysis')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   activeTab === 'analysis'
-                    ? 'bg-[#2a2a2a] text-[#e5e5e5]'
-                    : 'text-[#888] hover:text-[#e5e5e5]'
+                    ? 'bg-[#2a2a2a] text-[#e5e5e5] shadow-sm'
+                    : 'text-[#888] hover:text-[#e5e5e5] hover:bg-[#1a1a1a]'
                 }`}
               >
                 Analysis
               </button>
               <button
                 onClick={() => setActiveTab('graph')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center ${
                   activeTab === 'graph'
-                    ? 'bg-[#2a2a2a] text-[#e5e5e5]'
-                    : 'text-[#888] hover:text-[#e5e5e5]'
+                    ? 'bg-[#2a2a2a] text-[#e5e5e5] shadow-sm'
+                    : 'text-[#888] hover:text-[#e5e5e5] hover:bg-[#1a1a1a]'
                 }`}
               >
                 <BarChart3 className="w-4 h-4 mr-1" />

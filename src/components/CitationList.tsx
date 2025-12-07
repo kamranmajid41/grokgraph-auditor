@@ -44,10 +44,10 @@ export function CitationList({ citations, onCitationClick }: CitationListProps) 
         return (
           <div
             key={index}
-            className="flex items-start p-4 border border-[#2a2a2a] rounded-lg hover:bg-[#2a2a2a] cursor-pointer transition-colors"
+            className="flex items-start p-4 border border-[#2a2a2a] rounded-lg hover:bg-[#2a2a2a] hover:border-[#3a3a3a] cursor-pointer transition-all hover-lift group"
             onClick={() => onCitationClick?.(citation)}
           >
-            <div className={`p-2 rounded-lg ${colorClass} mr-4`}>
+            <div className={`p-2 rounded-lg ${colorClass} mr-4 group-hover:scale-110 transition-transform`}>
               <Icon className="w-5 h-5" />
             </div>
             

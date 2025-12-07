@@ -31,7 +31,7 @@ export function AuditDashboard({ results }: AuditDashboardProps) {
     <div className="space-y-6">
       {/* Quality Scores */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+        <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a] hover-lift hover:border-[#3a3a3a]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-[#888]">Overall Quality</p>
@@ -76,7 +76,7 @@ export function AuditDashboard({ results }: AuditDashboardProps) {
       </div>
 
       {/* Bias Metrics */}
-      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a] hover-lift hover:border-[#3a3a3a]">
         <h3 className="text-lg font-semibold mb-4 text-[#e5e5e5]">Bias & Diversity Metrics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
@@ -115,7 +115,7 @@ export function AuditDashboard({ results }: AuditDashboardProps) {
 
       {/* Red Flags */}
       {redFlags.length > 0 && (
-        <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+        <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a] hover-lift hover:border-[#3a3a3a]">
           <h3 className="text-lg font-semibold mb-4 flex items-center text-[#e5e5e5]">
             <AlertTriangle className="w-5 h-5 mr-2 text-red-400" />
             Red Flags ({redFlags.length})
@@ -141,7 +141,7 @@ export function AuditDashboard({ results }: AuditDashboardProps) {
 
       {/* Recommendations */}
       {recommendations.length > 0 && (
-        <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+        <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a] hover-lift hover:border-[#3a3a3a]">
           <h3 className="text-lg font-semibold mb-4 flex items-center text-[#e5e5e5]">
             <Info className="w-5 h-5 mr-2 text-blue-400" />
             Recommendations

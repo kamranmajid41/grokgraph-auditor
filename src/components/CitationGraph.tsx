@@ -52,38 +52,81 @@ export function CitationGraph({ graph }: CitationGraphProps) {
     }));
   }, [graph]);
 
+  // Custom tooltip and styling for dark theme
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-[#2a2a2a] border border-[#3a3a3a] rounded-lg p-3 shadow-lg">
+          <p className="text-[#e5e5e5] font-medium">{payload[0].name}</p>
+          <p className="text-[#888] text-sm">
+            {payload[0].value} {payload[0].name === 'Citations' ? 'citations' : 'sources'}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-6">
-      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a] hover-lift">
         <h3 className="text-lg font-semibold mb-4 text-[#e5e5e5]">Citation Distribution by Domain</h3>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
             <XAxis 
               dataKey="domain" 
               angle={-45}
               textAnchor="end"
               height={100}
               interval={0}
+              stroke="#888"
+              tick={{ fill: '#888', fontSize: 12 }}
             />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="count" fill="#3b82f6" name="Citations" />
+            <YAxis 
+              stroke="#888"
+              tick={{ fill: '#888', fontSize: 12 }}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              wrapperStyle={{ color: '#e5e5e5' }}
+              iconType="square"
+            />
+            <Bar 
+              dataKey="count" 
+              fill="#3b82f6" 
+              name="Citations"
+              radius={[4, 4, 0, 0]}
+            />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]">
+      <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a] hover-lift">
         <h3 className="text-lg font-semibold mb-4 text-[#e5e5e5]">Source Type Distribution</h3>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={sourceTypeData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="type" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="count" fill="#10b981" name="Count" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis 
+              dataKey="type" 
+              stroke="#888"
+              tick={{ fill: '#888', fontSize: 12 }}
+            />
+            <YAxis 
+              stroke="#888"
+              tick={{ fill: '#888', fontSize: 12 }}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              wrapperStyle={{ color: '#e5e5e5' }}
+              iconType="square"
+            />
+            <Bar 
+              dataKey="count" 
+              fill="#10b981" 
+              name="Count"
+              radius={[4, 4, 0, 0]}
+            />
           </ComposedChart>
         </ResponsiveContainer>
       </div>

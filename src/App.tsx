@@ -12,10 +12,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5]">
-          <Header />
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/article" element={<ArticlePage />} />
+            <Route path="/article" element={<><Header /><ArticlePage /></>} />
           </Routes>
         </div>
       </Router>
