@@ -45,7 +45,7 @@ export function useArticle() {
     let source: ArticleSource = 'fallback';
     
     try {
-      let content: string;
+      let content: string = '';
       let title: string = topic;
       let url: string = '';
       
