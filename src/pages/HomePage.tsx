@@ -17,7 +17,10 @@ export function HomePage() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/article?topic=${encodeURIComponent(searchQuery.trim())}`);
+      // Check if it's a URL - if so, pass it directly, otherwise treat as topic
+      const query = searchQuery.trim();
+      const isUrl = query.startsWith('http://') || query.startsWith('https://');
+      navigate(`/article?topic=${encodeURIComponent(query)}${isUrl ? '&url=true' : ''}`);
     }
   };
 
@@ -79,7 +82,7 @@ export function HomePage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search articles..."
+              placeholder="Search articles or paste Grokipedia URL..."
               className="w-full pl-12 pr-16 py-4 text-lg bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-[#e5e5e5] placeholder-[#666] focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:outline-none transition-all hover:border-[#3a3a3a]"
             />
             <button

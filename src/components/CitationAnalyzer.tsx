@@ -7,7 +7,7 @@ interface CitationAnalyzerProps {
   index: number;
 }
 
-export function CitationAnalyzer({ analysis, index }: CitationAnalyzerProps) {
+export function CitationAnalyzer({ analysis }: CitationAnalyzerProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
   const getScoreColor = (score: number) => {

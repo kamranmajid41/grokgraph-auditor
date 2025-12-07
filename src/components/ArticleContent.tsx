@@ -71,6 +71,8 @@ export function ArticleContent({ content, citations, chunkSize = DEFAULT_CHUNK_S
     return map;
   }, [citations]);
   
+  // Use citationMap in the link component
+  
   return (
     <div className="prose prose-lg max-w-none prose-invert">
       <ReactMarkdown
@@ -94,7 +96,7 @@ export function ArticleContent({ content, citations, chunkSize = DEFAULT_CHUNK_S
           ),
           // Style links
           a: ({ node, href, children, ...props }) => {
-            const citation = citations.find(c => c.url === href);
+            const citation = citationMap.get(href || '');
             return (
               <a
                 href={href}

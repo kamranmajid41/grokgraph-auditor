@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 import re
 import config
 import utils
+from grokipedia_crawler import fetch_grokipedia_article
 
 
 class ArticleIngester:
@@ -18,6 +19,47 @@ class ArticleIngester:
     
     def fetch_article(self, url: str) -> Optional[Dict]:
         """Fetch article from GrokiPedia URL"""
+        # Check if it's a Grokipedia.com URL - use the crawler
+        if "grokipedia.com" in url.lower():
+            try:
+                result = fetch_grokipedia_article(url)
+                if result:
+                    # Process citations with our utility functions
+                    processed_citations = []
+                    for cit in result.get("citations", []):
+                        processed_citations.append({
+                            "url": cit["url"],
+                            "text": cit.get("text", cit["url"]),
+                            "type": cit.get("type", "markdown"),
+                            "source_type": utils.classify_source_type(cit["url"]),
+                            "domain": utils.normalize_domain(cit["url"]),
+                            "reliability": utils.calculate_reliability_score(
+                                cit["url"],
+                                utils.classify_source_type(cit["url"])
+                            )
+                        })
+                    
+                    result["citations"] = processed_citations
+                    result["citation_count"] = len(processed_citations)
+                    
+                    # Also extract citations from the markdown content itself
+                    additional_citations = utils.extract_citations_from_text(result["content"])
+                    seen_urls = {c["url"] for c in processed_citations}
+                    for cit in additional_citations:
+                        if cit["url"] not in seen_urls:
+                            processed_citations.append(cit)
+                            seen_urls.add(cit["url"])
+                    
+                    result["citations"] = processed_citations
+                    result["citation_count"] = len(processed_citations)
+                    
+                return result
+            except Exception as e:
+                print(f"Error using Grokipedia crawler: {e}")
+                # Fall back to regular parsing
+                pass
+        
+        # Fallback to regular HTML parsing
         try:
             response = self.session.get(url, timeout=30)
             response.raise_for_status()

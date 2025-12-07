@@ -1,5 +1,5 @@
 import type { Citation, CitationAnalysis, DomainAnalysis, SourceTypeAnalysis } from '../types';
-import { calculateReliability, classifySourceType, extractDomain } from './citationUtils';
+import { extractDomain } from './citationUtils';
 
 /**
  * Analyze individual citations for detailed insights

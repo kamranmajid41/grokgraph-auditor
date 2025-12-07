@@ -12,7 +12,7 @@ export function ArticlePage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const topic = searchParams.get('topic') || '';
-  const { article, loading, error, analysis, createArticle, analyzeArticle } = useArticle();
+  const { article, loading, error, analysis, articleSource, createArticle, analyzeArticle } = useArticle();
   const [activeTab, setActiveTab] = useState<'article' | 'analysis' | 'graph' | 'deep'>('article');
 
   useEffect(() => {
@@ -32,7 +32,16 @@ export function ArticlePage() {
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-[#e5e5e5] mx-auto mb-4" />
-          <p className="text-[#888]">Creating article about "{topic}"...</p>
+          <p className="text-[#888]">
+            {topic.toLowerCase().includes('grokipedia.com') || topic.toLowerCase().includes('http')
+              ? `Fetching article from ${topic.substring(0, 50)}...`
+              : `Creating article about "${topic}"...`}
+          </p>
+          <p className="text-xs text-[#666] mt-2">
+            {topic.toLowerCase().includes('grokipedia.com') 
+              ? 'Note: Direct browser fetching may fail due to CORS. Using fallback if needed...'
+              : ''}
+          </p>
         </div>
       </div>
     );
@@ -134,7 +143,7 @@ export function ArticlePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'article' && (
-          <ArticleView article={article} />
+          <ArticleView article={article} source={articleSource} />
         )}
 
         {activeTab === 'analysis' && analysis && (

@@ -10,7 +10,7 @@ interface ComprehensiveAuditProps {
   analysis: AnalysisResults;
 }
 
-export function ComprehensiveAudit({ article, analysis }: ComprehensiveAuditProps) {
+export function ComprehensiveAudit({ analysis }: ComprehensiveAuditProps) {
   const [activeTab, setActiveTab] = useState<'citations' | 'domains' | 'sourceTypes' | 'summary'>('summary');
   
   const citationAnalyses = analysis.citationAnalyses || [];
