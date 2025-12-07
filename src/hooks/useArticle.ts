@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { Article, AnalysisResults } from '../types';
 import { generateArticle } from '../services/grokApi';
 import { extractCitationsFromText, buildCitationGraph, calculateBiasMetrics, calculateDiversityMetrics, calculateQualityScores, detectRedFlags } from '../utils/citationUtils';
+import { analyzeAllCitations, analyzeAllDomains, analyzeAllSourceTypes } from '../utils/individualAnalyzers';
 
 function generateFallbackArticle(topic: string): string {
   return `# ${topic}
@@ -90,12 +91,20 @@ export function useArticle() {
         recommendations.push(`Add citations from ${missingTypes.join(', ')} sources to improve credibility.`);
       }
       
+      // Generate individual analyses
+      const citationAnalyses = analyzeAllCitations(citations);
+      const domainAnalyses = analyzeAllDomains(citations);
+      const sourceTypeAnalyses = analyzeAllSourceTypes(citations);
+      
       const analysisResults: AnalysisResults = {
         biasMetrics,
         diversityMetrics,
         qualityScores,
         redFlags,
         recommendations,
+        citationAnalyses,
+        domainAnalyses,
+        sourceTypeAnalyses,
       };
       
       setAnalysis(analysisResults);
@@ -133,12 +142,20 @@ export function useArticle() {
       recommendations.push('Add citations from academic, government, and NGO sources.');
     }
     
+    // Generate individual analyses
+    const citationAnalyses = analyzeAllCitations(citations);
+    const domainAnalyses = analyzeAllDomains(citations);
+    const sourceTypeAnalyses = analyzeAllSourceTypes(citations);
+    
     const analysisResults: AnalysisResults = {
       biasMetrics,
       diversityMetrics,
       qualityScores,
       redFlags,
       recommendations,
+      citationAnalyses,
+      domainAnalyses,
+      sourceTypeAnalyses,
     };
     
     setAnalysis(analysisResults);

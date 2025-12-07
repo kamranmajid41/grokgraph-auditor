@@ -73,5 +73,58 @@ export interface AnalysisResults {
   qualityScores: QualityScores;
   redFlags: RedFlag[];
   recommendations: string[];
+  // Detailed individual analyses
+  citationAnalyses?: CitationAnalysis[];
+  domainAnalyses?: DomainAnalysis[];
+  sourceTypeAnalyses?: SourceTypeAnalysis[];
+}
+
+export interface CitationAnalysis {
+  citation: Citation;
+  score: number;
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+  reliabilityBreakdown: {
+    baseScore: number;
+    domainBoost: number;
+    penalties: number;
+    finalScore: number;
+  };
+  context: {
+    positionInArticle: number;
+    domainRank: number;
+    sourceTypeRank: number;
+  };
+}
+
+export interface DomainAnalysis {
+  domain: string;
+  citationCount: number;
+  averageReliability: number;
+  sourceTypes: string[];
+  citations: Citation[];
+  metrics: {
+    concentration: number;
+    diversity: number;
+    quality: number;
+  };
+  issues: string[];
+  recommendations: string[];
+}
+
+export interface SourceTypeAnalysis {
+  sourceType: Citation['sourceType'];
+  citationCount: number;
+  averageReliability: number;
+  domains: string[];
+  citations: Citation[];
+  metrics: {
+    representation: number; // percentage of total citations
+    averageQuality: number;
+    diversity: number;
+  };
+  issues: string[];
+  recommendations: string[];
 }
 

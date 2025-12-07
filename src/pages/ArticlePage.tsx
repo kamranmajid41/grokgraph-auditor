@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArticleView } from '../components/ArticleView';
 import { AuditDashboard } from '../components/AuditDashboard';
 import { CitationGraph } from '../components/CitationGraph';
+import { ComprehensiveAudit } from '../components/ComprehensiveAudit';
 import { useArticle } from '../hooks/useArticle';
 import { buildCitationGraph } from '../utils/citationUtils';
 import { Loader2, ArrowLeft, BarChart3 } from 'lucide-react';
@@ -12,15 +13,19 @@ export function ArticlePage() {
   const navigate = useNavigate();
   const topic = searchParams.get('topic') || '';
   const { article, loading, error, analysis, createArticle, analyzeArticle } = useArticle();
-  const [activeTab, setActiveTab] = useState<'article' | 'analysis' | 'graph'>('article');
+  const [activeTab, setActiveTab] = useState<'article' | 'analysis' | 'graph' | 'deep'>('article');
 
   useEffect(() => {
     if (topic && !article && !loading) {
       createArticle(topic).catch(console.error);
-    } else if (article && !analysis) {
+    }
+  }, [topic]); // Only depend on topic to avoid infinite loops
+  
+  useEffect(() => {
+    if (article && !analysis) {
       analyzeArticle(article);
     }
-  }, [topic, article, loading, analysis, createArticle, analyzeArticle]);
+  }, [article]); // Only depend on article
 
   if (loading && !article) {
     return (
@@ -112,6 +117,16 @@ export function ArticlePage() {
                 <BarChart3 className="w-4 h-4 mr-1" />
                 Graph
               </button>
+              <button
+                onClick={() => setActiveTab('deep')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center ${
+                  activeTab === 'deep'
+                    ? 'bg-[#2a2a2a] text-[#e5e5e5] shadow-sm'
+                    : 'text-[#888] hover:text-[#e5e5e5] hover:bg-[#1a1a1a]'
+                }`}
+              >
+                Deep Audit
+              </button>
             </div>
           </div>
         </div>
@@ -131,6 +146,12 @@ export function ArticlePage() {
         {activeTab === 'graph' && (
           <div>
             <CitationGraph graph={graph} />
+          </div>
+        )}
+
+        {activeTab === 'deep' && analysis && (
+          <div>
+            <ComprehensiveAudit article={article} analysis={analysis} />
           </div>
         )}
       </div>
